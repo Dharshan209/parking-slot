@@ -5,5 +5,5 @@ export class ParkCarDto {
   reg_no: string;
 
   @IsString()
-  colour: string;
+  color: string;
 }

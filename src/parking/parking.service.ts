@@ -87,24 +87,24 @@ export class ParkingService {
     const result: {
       slot_no: number;
       car_registration: string;
-      car_colour: string;
+      car_color: string;
     }[] = [];
     for (const [slot, Car] of this.allocation.entries()) {
       result.push({
         slot_no: slot,
         car_registration: Car.reg_no,
-        car_colour: Car.colour,
+        car_color: Car.color,
       });
     }
     return result;
   }
 
-  //getresgistration from colour
-  getregByColour(color: string) {
+  //getresgistration from color
+  getregByColor(color: string) {
     const registrations: string[] = [];
     
     for (const [_, car] of this.allocation.entries()) {
-      if (car.colour.toLowerCase() === color.toLowerCase()) {
+      if (car.color.toLowerCase() === color.toLowerCase()) {
         registrations.push(car.reg_no);
       }
     }
@@ -140,7 +140,7 @@ export class ParkingService {
     const slots: number[] = [];
     
     for (const [slot, car] of this.allocation.entries()) {
-      if (car.colour.toLowerCase() === color.toLowerCase()) {
+      if (car.color.toLowerCase() === color.toLowerCase()) {
         slots.push(slot);
       }
     }

@@ -31,7 +31,7 @@ export class ParkingController {
   parkCar(@Body() body: ParkCarDto) {
     return this.parkingService.Park({
       reg_no: body.reg_no,
-      colour: body.colour,
+      color: body.color,
     });
   }
 
@@ -54,7 +54,7 @@ export class ParkingController {
 
   @Get('/registration_numbers/color/:color')
   getRegistrationsByColor(@Param('color') color: string) {
-    return this.parkingService.getregByColour(color);
+    return this.parkingService.getregByColor(color);
   }
 
   @Get('/slot')
