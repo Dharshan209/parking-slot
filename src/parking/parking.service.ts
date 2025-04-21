@@ -98,4 +98,60 @@ export class ParkingService {
     }
     return result;
   }
+
+  //getresgistration from colour
+  getregByColour(color: string) {
+    const registrations: string[] = [];
+    
+    for (const [_, car] of this.allocation.entries()) {
+      if (car.colour.toLowerCase() === color.toLowerCase()) {
+        registrations.push(car.reg_no);
+      }
+    }
+    
+    if (registrations.length === 0) {
+      throw new NotFoundException(`No cars found with color: ${color}`);
+    }
+    
+    return {
+      color,
+      registration_numbers: registrations
+    };
+  }
+
+
+  //get slot by registernumber
+  getslotbyreg(reg_no: string) {
+    const slot = this.slottoreg.get(reg_no);
+    
+    if (!slot) {
+      throw new NotFoundException(`Car with registration number ${reg_no} not found`);
+    }
+    
+    return {
+      registration_number: reg_no,
+      slot_number: slot
+    };
+  }
+
+
+  //get slot by color
+  getslotsbycolor(color: string) {
+    const slots: number[] = [];
+    
+    for (const [slot, car] of this.allocation.entries()) {
+      if (car.colour.toLowerCase() === color.toLowerCase()) {
+        slots.push(slot);
+      }
+    }
+    
+    if (slots.length === 0) {
+      throw new NotFoundException(`No cars found with color: ${color}`);
+    }
+    
+    return {
+      color,
+      slot_numbers: slots
+    };
+  }
 }

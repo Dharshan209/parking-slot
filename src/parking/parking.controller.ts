@@ -2,6 +2,9 @@ import {
   Post,
   Get,
   Body,
+  Param,
+  Query,
+  Patch,
   BadRequestException,
   Controller,
 } from '@nestjs/common';
@@ -17,6 +20,11 @@ export class ParkingController {
   @Post('/parking_lot')
   createParkingLot(@Body() body: CreateParkingDto) {
     return this.parkingService.initialize(body.no_of_slot);
+  }
+
+  @Patch('/parking_lot')
+  expandLot(@Body('increment_slot') increment: number) {
+    return this.parkingService.expand(increment);
   }
 
   @Post('/park')
@@ -42,5 +50,24 @@ export class ParkingController {
   @Get('/status')
   getStatus() {
     return this.parkingService.getlist();
+  }
+
+  @Get('/registration_numbers/color/:color')
+  getRegistrationsByColor(@Param('color') color: string) {
+    return this.parkingService.getregByColour(color);
+  }
+
+  @Get('/slot')
+  getSlotByRegistration(@Query('registration_number') reg_no: string) {
+    if (!reg_no) {
+      throw new BadRequestException('Registration number is required');
+    }
+    return this.parkingService.getslotbyreg
+    (reg_no);
+  }
+
+  @Get('/slots/color/:color')
+  getSlotsByColor(@Param('color') color: string) {
+    return this.parkingService.getslotsbycolor(color);
   }
 }
