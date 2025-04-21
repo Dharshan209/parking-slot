@@ -3,6 +3,7 @@
 ## Base URL
 
 All endpoints are relative to `http://localhost:3000` by default.
+And also use this `https://parking-slot-six.vercel.app/` endpoint
 
 ## Authentication
 
