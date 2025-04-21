@@ -1,68 +1,101 @@
-import { Injectable,BadRequestException,NotFoundException} from '@nestjs/common';
-import {car} from "./interface/car.interface";
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
+import { Car } from './interface/car.interface';
 
 @Injectable()
 export class ParkingService {
-    private totalslots : number =0;
-    private availbleslots : number[] = [];
-    private allocation : Map<number,car> = new Map();
-    private slottoreg : Map<String,number> = new Map();
-    
-    //Fisrt set parking lot size
-    initialize(no_of_slot:number){
-       this.totalslots=no_of_slot;
-       this.availbleslots=Array.from({length:no_of_slot},(_,i)=>i+1);
-       return {total_slot : this.totalslots};
+  private totalslots: number = 0;
+  private availbleslots: number[] = [];
+  private allocation: Map<number, Car> = new Map();
+  private slottoreg: Map<string, number> = new Map();
+
+  //First set parking lot size
+  initialize(no_of_slot: number) {
+    this.totalslots = no_of_slot;
+    this.availbleslots = Array.from({ length: no_of_slot }, (_, i) => i + 1);
+    return { total_slot: this.totalslots };
+  }
+
+  //this expand already parking slots instansexc
+  expand(increment: number) {
+    const n = this.totalslots;
+    const additionalslot = Array.from(
+      { length: increment },
+      (_, i) => n + i + 1,
+    );
+    this.totalslots += increment;
+    this.availbleslots.push(...additionalslot);
+    return {
+      total_slots: this.totalslots,
+    };
+  }
+
+  //allocate car to slot
+  Park(car: Car) {
+    if (this.totalslots === 0) {
+      throw new BadRequestException(
+        'Parking lot not initialized. Please create parking lot first.',
+      );
     }
 
-    //this expand already parking slots instansexc
-    expand(increment:number){
-        const n = this.totalslots;
-        const additionalslot = Array.from({length:increment},(_,i)=>n+i+1);
-        this.totalslots += increment;
-        this.availbleslots.push(...additionalslot);
-        return{
-            total_slots:this.totalslots
-        };
+    if (this.availbleslots.length == 0) {
+      throw new BadRequestException('Parking is full. No slots available.');
     }
 
-    //allcate car to slot
-    Park(Car:car){
-        if(this.availbleslots.length==0){
-            throw new BadRequestException('Parking is full.speed up dude');
-        }
+    this.availbleslots.sort((a, b) => a - b);
+    const slot_number = this.availbleslots.shift()!;
+    this.allocation.set(slot_number, car);
+    this.slottoreg.set(car.reg_no, slot_number);
 
-        this.availbleslots.sort((a,b)=>a-b);
-        const slot_number = this.availbleslots.shift()!;
-        this.allocation.set(slot_number,Car);
-        this.slottoreg.set(Car.reg_no,slot_number,);
+    return {
+      allocated_slot: slot_number,
+    };
+  }
 
-        return{
-            allocated_slot : slot_number
-        };
+  //clear by slot
+  clearbyslot(slot: number) {
+    if (!this.allocation.has(slot))
+      throw new NotFoundException('Slot already free.');
+    const car = this.allocation.get(slot)!;
 
+    this.allocation.delete(slot);
+    this.slottoreg.delete(car.reg_no);
+    this.availbleslots.push(slot);
+
+    return {
+      cleared_slot: slot,
+    };
+  }
+
+  //clear by registration number
+  clearbyregno(reg_no: string) {
+    const slot = this.slottoreg.get(reg_no);
+    if (!slot) {
+      throw new NotFoundException(
+        'Car with this registration number not found.',
+      );
     }
 
-    //clear by slot
-    clearbyslot(slot:number){
-        if(!this.allocation.has(slot)) throw new NotFoundException('Slot already free.');
-        const car = this.allocation.get(slot)!;
+    return this.clearbyslot(slot);
+  }
 
-        this.allocation.delete(slot);
-        this.slottoreg.delete(car.reg_no);
-        this.availbleslots.push(slot);
-
-        return {
-            cleared_slot : slot
-        };
+  //list of cars in parking lot
+  getlist() {
+    const result: {
+      slot_no: number;
+      car_registration: string;
+      car_colour: string;
+    }[] = [];
+    for (const [slot, Car] of this.allocation.entries()) {
+      result.push({
+        slot_no: slot,
+        car_registration: Car.reg_no,
+        car_colour: Car.colour,
+      });
     }
-
-    //list of cars in parking lot
-    getlist(){
-        const result: { slot_no: number; car_regestration: String; car_colour: String }[] = [];
-        for(const [slot,Car] of this.allocation.entries()){
-           result.push({slot_no:slot, car_regestration:Car.reg_no, car_colour :Car.colour}); 
-        }
-        return result;
-    }
+    return result;
+  }
 }

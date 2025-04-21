@@ -1,6 +1,6 @@
 import { IsOptional, IsString, IsInt } from 'class-validator';
 
-export class clearSlotDto {
+export class ClearSlotDto {
   @IsOptional()
   @IsInt()
   slot_number?: number;

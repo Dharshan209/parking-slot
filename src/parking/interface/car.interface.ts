@@ -1,4 +1,4 @@
-export interface car{
-    reg_no : String;
-    colour : String;
+export interface Car {
+  reg_no: string;
+  colour: string;
 }
