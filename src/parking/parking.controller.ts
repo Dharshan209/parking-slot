@@ -13,7 +13,7 @@ import { CreateParkingDto } from './dto/create-parking.dto';
 import { ParkCarDto } from './dto/park-car.dto';
 import { ClearSlotDto } from './dto/clear-slot.dto';
 
-@Controller('parking')
+@Controller()
 export class ParkingController {
   constructor(private readonly parkingService: ParkingService) {}
 
